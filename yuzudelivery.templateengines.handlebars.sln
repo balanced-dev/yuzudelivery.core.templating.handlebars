@@ -1,0 +1,54 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "00 - Solution Items", "00 - Solution Items", "{1B477D38-F87E-4C1D-9E25-1DD0C85B15F4}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		azure-pipelines.yml = azure-pipelines.yml
+		Directory.Build.props = Directory.Build.props
+		license.txt = license.txt
+		readme.md = readme.md
+		version.json = version.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01 - Libs", "01 - Libs", "{3FB2DB06-DD33-40FC-A3DA-AA7270BA928F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YuzuDelivery.TemplateEngines.Handlebars", "src\YuzuDelivery.TemplateEngines.Handlebars\YuzuDelivery.TemplateEngines.Handlebars.csproj", "{3DEA5149-B5E2-47FF-B2EB-A9731384BD17}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02 - Tests", "02 - Tests", "{BA29EB13-33F1-4E0E-8280-67F9B9A68823}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YuzuDelivery.TemplateEngines.Handlebars.Tests", "tests\YuzuDelivery.TemplateEngines.Handlebars.Tests\YuzuDelivery.TemplateEngines.Handlebars.Tests.csproj", "{3E169351-F8BC-46D3-9845-471A79FAB39D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "_build", "build\_build.csproj", "{BE911C13-864D-4C28-A47C-9D4939350179}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{3DEA5149-B5E2-47FF-B2EB-A9731384BD17} = {3FB2DB06-DD33-40FC-A3DA-AA7270BA928F}
+		{3E169351-F8BC-46D3-9845-471A79FAB39D} = {BA29EB13-33F1-4E0E-8280-67F9B9A68823}
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3DEA5149-B5E2-47FF-B2EB-A9731384BD17}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3DEA5149-B5E2-47FF-B2EB-A9731384BD17}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3DEA5149-B5E2-47FF-B2EB-A9731384BD17}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3DEA5149-B5E2-47FF-B2EB-A9731384BD17}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3E169351-F8BC-46D3-9845-471A79FAB39D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E169351-F8BC-46D3-9845-471A79FAB39D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E169351-F8BC-46D3-9845-471A79FAB39D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E169351-F8BC-46D3-9845-471A79FAB39D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE911C13-864D-4C28-A47C-9D4939350179}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE911C13-864D-4C28-A47C-9D4939350179}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE911C13-864D-4C28-A47C-9D4939350179}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE911C13-864D-4C28-A47C-9D4939350179}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
