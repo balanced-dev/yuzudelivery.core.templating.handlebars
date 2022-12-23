@@ -28,7 +28,8 @@ public class YuzuHandlebarsTemplateEngine : IYuzuTemplateEngine
         Helpers.PictureSource.Register();
     }
 
-    public YuzuHandlebarsTemplateEngine(ILogger<YuzuHandlebarsTemplateEngine> logger, IOptions<HandlebarsSettings> settings)
+    public YuzuHandlebarsTemplateEngine(ILogger<YuzuHandlebarsTemplateEngine> logger,
+        IOptions<HandlebarsSettings> settings)
     {
         _logger = logger;
         _settings = settings;
@@ -63,18 +64,18 @@ public class YuzuHandlebarsTemplateEngine : IYuzuTemplateEngine
                 ProcessTemplates(contents, Path.Combine(path, fileInfo.Name));
             }
 
-            else if(Path.GetExtension(fileInfo.Name) == _settings.Value.HandlebarsFileExtension)
+            else if (Path.GetExtension(fileInfo.Name) == _settings.Value.HandlebarsFileExtension)
             {
                 var templateName = Path.GetFileNameWithoutExtension(fileInfo.Name);
-                using var stream = fileInfo.CreateReadStream();
+
                 if (fileInfo.Name.StartsWith(_settings.Value.PartialPrefix))
                 {
-                    AddPartial(templateName, stream);
+                    using var partialStream = fileInfo.CreateReadStream();
+                    AddPartial(templateName, partialStream);
                 }
-                else
-                {
-                    AddPage(templateName, stream);
-                }
+
+                using var stream = fileInfo.CreateReadStream();
+                AddPage(templateName, stream);
             }
         }
     }

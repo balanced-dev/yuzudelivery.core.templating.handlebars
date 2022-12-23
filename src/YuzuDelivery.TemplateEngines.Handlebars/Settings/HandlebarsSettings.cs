@@ -7,7 +7,7 @@ public class HandlebarsSettings
 {
     private const string DefaultPartialPrefix = "par";
     private const string DefaultTemplatesPath = "./Yuzu/_templates";
-    private const string DefaultHandlebarsFileExtensions = ".hbs";
+    private const string DefaultHandlebarsFileExtension = ".hbs";
 
     [DefaultValue(DefaultPartialPrefix)]
     public string PartialPrefix { get; set; } = DefaultPartialPrefix;
@@ -15,8 +15,8 @@ public class HandlebarsSettings
     [DefaultValue(DefaultTemplatesPath)]
     public string TemplatesPath { get; set; } = DefaultTemplatesPath;
 
-    [DefaultValue(DefaultHandlebarsFileExtensions)]
-    public string HandlebarsFileExtension { get; set; } = DefaultHandlebarsFileExtensions;
+    [DefaultValue(DefaultHandlebarsFileExtension)]
+    public string HandlebarsFileExtension { get; set; } = DefaultHandlebarsFileExtension;
 
     public IFileProvider TemplatesFileProvider { get; set; } = null!;
 }
