@@ -30,4 +30,10 @@
     <ProjectReference Include="..\..\..\yuzudelivery.core\src\YuzuDelivery.Core\YuzuDelivery.Core.csproj" />
   </ItemGroup>
 
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Physical" Version="6.0.0" />
+  </ItemGroup>
+
 </Project>

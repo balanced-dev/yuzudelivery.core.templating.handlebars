@@ -1,14 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using YuzuDelivery.Core;
+using YuzuDelivery.Core.Settings;
+using YuzuDelivery.TemplateEngines.Handlebars.Settings;
 
 namespace YuzuDelivery.TemplateEngines.Handlebars;
 
 // ReSharper disable once UnusedType.Global -- Used downstream
 public class YuzuHandlebarsTemplateEngine : IYuzuTemplateEngine
 {
+    private readonly ILogger<YuzuHandlebarsTemplateEngine> _logger;
+    private readonly IOptions<HandlebarsSettings> _settings;
+
     private readonly IDictionary<string, HandlebarsDotNet.HandlebarsTemplate<object, string>> _cache =
         new Dictionary<string, HandlebarsDotNet.HandlebarsTemplate<object, string>>();
 
@@ -24,12 +28,12 @@ public class YuzuHandlebarsTemplateEngine : IYuzuTemplateEngine
         Helpers.PictureSource.Register();
     }
 
-    public YuzuHandlebarsTemplateEngine(IYuzuConfiguration config)
+    public YuzuHandlebarsTemplateEngine(ILogger<YuzuHandlebarsTemplateEngine> logger, IOptions<HandlebarsSettings> settings)
     {
-        foreach (var location in config.TemplateLocations ?? new List<ITemplateLocation>())
-        {
-            ProcessTemplates(new DirectoryInfo(location.Path), location);
-        }
+        _logger = logger;
+        _settings = settings;
+
+        ProcessTemplates(settings.Value.TemplatesFileProvider, string.Empty);
     }
 
     public string Render(string templateName, object model)
@@ -50,41 +54,44 @@ public class YuzuHandlebarsTemplateEngine : IYuzuTemplateEngine
         }
     }
 
-    private void ProcessTemplates(DirectoryInfo directory, ITemplateLocation location)
+    private void ProcessTemplates(IFileProvider contents, string path)
     {
-        if (location.SearchSubDirectories)
+        foreach (var fileInfo in contents.GetDirectoryContents(path))
         {
-            foreach (var d in directory.GetDirectories())
+            if (fileInfo.IsDirectory)
             {
-                ProcessTemplates(d, location);
-            }
-        }
-
-        foreach (var f in directory.GetFiles().Where(x => x.Extension == ".hbs"))
-        {
-            if (location.RegisterAllAsPartials)
-            {
-                RegisterPartial(f);
+                ProcessTemplates(contents, Path.Combine(path, fileInfo.Name));
             }
 
-            AddCompiledTemplates(f);
+            else if(Path.GetExtension(fileInfo.Name) == _settings.Value.HandlebarsFileExtension)
+            {
+                var templateName = Path.GetFileNameWithoutExtension(fileInfo.Name);
+                using var stream = fileInfo.CreateReadStream();
+                if (fileInfo.Name.StartsWith(_settings.Value.PartialPrefix))
+                {
+                    AddPartial(templateName, stream);
+                }
+                else
+                {
+                    AddPage(templateName, stream);
+                }
+            }
         }
     }
 
-    private void RegisterPartial(FileInfo f)
+    private void AddPartial(string name, Stream fileStream)
     {
-        using var reader = new StringReader(File.ReadAllText(f.FullName));
-
+        _logger.LogDebug("Registering partial view: '{partial}", name);
+        using var reader = new StreamReader(fileStream);
         var compiled = HandlebarsDotNet.Handlebars.Compile(reader);
-        var templateName = Path.GetFileNameWithoutExtension(f.Name);
-
-        HandlebarsDotNet.Handlebars.RegisterTemplate(templateName, compiled);
+        HandlebarsDotNet.Handlebars.RegisterTemplate(name, compiled);
     }
 
-    private void AddCompiledTemplates(FileInfo f)
+    private void AddPage(string name, Stream fileStream)
     {
-        var source = File.ReadAllText(f.FullName);
-        var compiled = HandlebarsDotNet.Handlebars.Compile(source);
-        _cache.Add(Path.GetFileNameWithoutExtension(f.Name), compiled);
+        _logger.LogDebug("Registering view: '{view}", name);
+        using var reader = new StreamReader(fileStream);
+        var compiled = HandlebarsDotNet.Handlebars.Compile(reader.ReadToEnd());
+        _cache.Add(name, compiled);
     }
 }
