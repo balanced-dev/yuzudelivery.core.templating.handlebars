@@ -14,7 +14,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IYuzuTemplateEngine,YuzuHandlebarsTemplateEngine>();
 
         services.AddOptions<HandlebarsSettings>()
-                .Configure<IConfiguration, IHostingEnvironment>((s, cfg, host) =>
+                .Configure<IConfiguration, IHostingEnvironment, IEnumerable<IBaseSiteConfig>> ((s, cfg, host, baseConfigs) =>
                 {
                     cfg.GetSection("Yuzu:TemplateEngine").Bind(s);
 
@@ -22,8 +22,11 @@ public static class ServiceCollectionExtensions
                     {
                         s.TemplatesPath = Path.Combine(host.ContentRootPath, s.TemplatesPath);
                     }
-                    
-                    s.TemplatesFileProvider = new PhysicalFileProvider(s.TemplatesPath);
+
+                    var fileProviders = baseConfigs.Select(c => c.TemplateFileProvider).ToList();
+                    fileProviders.Insert(0, new PhysicalFileProvider(s.TemplatesPath));
+
+                    s.TemplatesFileProvider = new CompositeFileProvider(fileProviders);
                 });
 
         return services;
