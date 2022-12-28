@@ -59,19 +59,18 @@ public class YuzuHandlebarsTemplateEngine : IYuzuTemplateEngine
     {
         if(!islayout)
         {
+            var fileStream = fileInfo.CreateReadStream();
+            using var reader = new StreamReader(fileStream);
 
             if (isPartial)
             {
-                var partialFileStream = fileInfo.CreateReadStream();
-                using var partialReader = new StreamReader(partialFileStream);
                 _logger.LogDebug("Registering partial view: '{partial}", name);
-                var partial = HandlebarsDotNet.Handlebars.Compile(partialReader);
+                var partial = HandlebarsDotNet.Handlebars.Compile(reader);
                 HandlebarsDotNet.Handlebars.RegisterTemplate(name, partial);
             }
 
-            //Can't re-used the stream, easiest to recreate from fileinfo
-            var fileStream = fileInfo.CreateReadStream();
-            using var reader = new StreamReader(fileStream);
+            fileStream.Position = 0;
+
             _logger.LogDebug("Registering view: '{view}", name);
             var compiled = HandlebarsDotNet.Handlebars.Compile(reader.ReadToEnd());
             _cache.Add(name, compiled);
