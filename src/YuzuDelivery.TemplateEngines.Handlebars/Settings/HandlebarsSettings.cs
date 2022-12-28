@@ -5,12 +5,8 @@ namespace YuzuDelivery.TemplateEngines.Handlebars.Settings;
 
 public class HandlebarsSettings
 {
-    private const string DefaultPartialPrefix = "par";
     private const string DefaultTemplatesPath = "./Yuzu/_templates";
     private const string DefaultHandlebarsFileExtension = ".hbs";
-
-    [DefaultValue(DefaultPartialPrefix)]
-    public string PartialPrefix { get; set; } = DefaultPartialPrefix;
 
     [DefaultValue(DefaultTemplatesPath)]
     public string TemplatesPath { get; set; } = DefaultTemplatesPath;

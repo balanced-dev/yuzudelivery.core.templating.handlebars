@@ -22,7 +22,7 @@ public static class ServiceCollectionExtensions
                     {
                         s.TemplatesPath = Path.Combine(host.ContentRootPath, s.TemplatesPath);
                     }
-
+                    
                     s.TemplatesFileProvider = new PhysicalFileProvider(s.TemplatesPath);
                 });
 
