@@ -24,7 +24,7 @@ public static class ServiceCollectionExtensions
                     }
 
                     var fileProviders = baseConfigs.Select(c => c.TemplateFileProvider).ToList();
-                    fileProviders.Insert(0, new PhysicalFileProvider(s.TemplatesPath));
+                    if(Directory.Exists(s.TemplatesPath)) fileProviders.Insert(0, new PhysicalFileProvider(s.TemplatesPath));
 
                     s.TemplatesFileProvider = new CompositeFileProvider(fileProviders);
                 });
