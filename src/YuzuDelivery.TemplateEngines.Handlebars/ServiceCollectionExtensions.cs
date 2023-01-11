@@ -1,7 +1,7 @@
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Hosting;
 using YuzuDelivery.Core;
 using YuzuDelivery.TemplateEngines.Handlebars.Settings;
 
@@ -14,7 +14,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IYuzuTemplateEngine,YuzuHandlebarsTemplateEngine>();
 
         services.AddOptions<HandlebarsSettings>()
-                .Configure<IConfiguration, IHostingEnvironment> ((s, cfg, host) =>
+                .Configure<IConfiguration, IHostEnvironment> ((s, cfg, host) =>
                 {
                     if (s.TemplatesFileProvider != null)
                     {
