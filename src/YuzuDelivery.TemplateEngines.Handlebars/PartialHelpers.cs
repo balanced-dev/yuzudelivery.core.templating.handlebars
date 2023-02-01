@@ -20,7 +20,7 @@ public static class PartialHelpers
         var paramType = parameters[1].GetType();
         var properties = new Dictionary<string, object>();
 
-        if (parameters[1] is Dictionary<string, object>)
+        if (parameters[1] is Dictionary<string, object> && paramType != typeof(HashParameterDictionary))
         {
             properties = parameters[1] as Dictionary<string, object>;
         }
