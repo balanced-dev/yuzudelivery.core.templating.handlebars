@@ -19,25 +19,33 @@ public static class PartialHelpers
     {
         var paramType = parameters[1].GetType();
         var properties = new Dictionary<string, object>();
-        //we can't support modifiers and hashParameters on generic types
-        //check if namespace is null since anonymous types count as generic
-        if (paramType.IsSimple() || paramType.IsArray || (paramType.IsGenericType && paramType.Namespace != null))
-        {
-            return null;
-        }
 
-        if (paramType != typeof(HashParameterDictionary))
+        if (parameters[1] is Dictionary<string, object>)
         {
-            properties = paramType.GetProperties().ToDictionary(
-                property => StringExtensions.FirstCharacterToLower(property.Name),
-                property => property.GetValue(parameters[1]));
+            properties = parameters[1] as Dictionary<string, object>;
         }
-        // when context is implicitly given
-        else if(context != null)
+        else
         {
-            properties = ((object)context).GetType().GetProperties().ToDictionary(
-                property => StringExtensions.FirstCharacterToLower(property.Name),
-                property => property.GetValue(context));
+            //we can't support modifiers and hashParameters on generic types
+            //check if namespace is null since anonymous types count as generic
+            if (paramType.IsSimple() || paramType.IsArray || (paramType.IsGenericType && paramType.Namespace != null))
+            {
+                return null;
+            }
+
+            if (paramType != typeof(HashParameterDictionary))
+            {
+                properties = paramType.GetProperties().ToDictionary(
+                    property => StringExtensions.FirstCharacterToLower(property.Name),
+                    property => property.GetValue(parameters[1]));
+            }
+            // when context is implicitly given
+            else if (context != null)
+            {
+                properties = ((object)context).GetType().GetProperties().ToDictionary(
+                    property => StringExtensions.FirstCharacterToLower(property.Name),
+                    property => property.GetValue(context));
+            }
         }
 
         var modifiers = parameters.Where((source, index) => index > 1)
@@ -61,7 +69,14 @@ public static class PartialHelpers
 
         foreach (var parameter in hashParameterDictionary)
         {
-            properties.Add(parameter.Key, parameter.Value);
+            if(properties.ContainsKey(parameter.Key))
+            {
+                properties[parameter.Key] = parameter.Value;
+            }
+            else
+            {
+                properties.Add(parameter.Key, parameter.Value);
+            }
         }
 
         return properties;
