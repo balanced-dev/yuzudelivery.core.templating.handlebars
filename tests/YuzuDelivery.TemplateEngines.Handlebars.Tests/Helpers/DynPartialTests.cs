@@ -160,6 +160,55 @@ namespace YuzuDelivery.TemplateEngines.Handlebars.Helpers
             Assert.That(output, Is.EqualTo("test bar"));
         }
 
+        [Test]
+        public void given_path_and_context_where_context_is_a_dictionary()
+        {
+            var source = "{{{dynPartial 'partialName' foo}}}";
+            var partialSource = "test {{bar}}";
+            var template = HandlebarsDotNet.Handlebars.Compile(source);
+
+            using (var reader = new StringReader(partialSource))
+            {
+                var partialTemplate = HandlebarsDotNet.Handlebars.Compile(reader);
+                HandlebarsDotNet.Handlebars.RegisterTemplate("partialName", partialTemplate);
+            }
+
+            var data = new
+            {
+                foo = new Dictionary<string, object>()
+                {
+                    { "bar", "foo bar" }
+                }
+            };
+
+            var output = template(data);
+            Assert.That(output, Is.EqualTo("test foo bar"));
+        }
+
+        [Test]
+        public void given_path_and_context_where_context_is_a_dictionary_with_a_parameter()
+        {
+            var source = "{{{dynPartial 'partialName' foo param='test'}}}";
+            var partialSource = "test {{bar}} {{param}}";
+            var template = HandlebarsDotNet.Handlebars.Compile(source);
+
+            using (var reader = new StringReader(partialSource))
+            {
+                var partialTemplate = HandlebarsDotNet.Handlebars.Compile(reader);
+                HandlebarsDotNet.Handlebars.RegisterTemplate("partialName", partialTemplate);
+            }
+
+            var data = new
+            {
+                foo = new Dictionary<string, object>()
+                {
+                    { "bar", "foo bar" }
+                }
+            };
+
+            var output = template(data);
+            Assert.That(output, Is.EqualTo("test foo bar test"));
+        }
 
         [Test]
         public void given_path_context_and_parameter()
@@ -209,6 +258,31 @@ namespace YuzuDelivery.TemplateEngines.Handlebars.Helpers
 
             var output = template(data);
             Assert.That(output, Is.EqualTo("test foo bar test test again"));
+        }
+
+        [Test]
+        public void given_path_context_and_parametes_that_clash_then_params_override_context_values()
+        {
+            var source = "{{{dynPartial 'partialName' foo bar='test'}}}";
+            var partialSource = "test {{bar}}";
+            var template = HandlebarsDotNet.Handlebars.Compile(source);
+
+            using (var reader = new StringReader(partialSource))
+            {
+                var partialTemplate = HandlebarsDotNet.Handlebars.Compile(reader);
+                HandlebarsDotNet.Handlebars.RegisterTemplate("partialName", partialTemplate);
+            }
+
+            var data = new
+            {
+                foo = new
+                {
+                    bar = "foo bar"
+                }
+            };
+
+            var output = template(data);
+            Assert.That(output, Is.EqualTo("test test"));
         }
 
         [Test]
