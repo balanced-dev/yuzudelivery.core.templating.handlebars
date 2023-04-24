@@ -61,8 +61,11 @@ public class YuzuHandlebarsTemplateEngine : IYuzuTemplateEngine
 
     private void ProcessTemplates(IFileProvider contents, string path)
     {
+        var files = contents.GetDirectoryContents(path).Select(x => x.Name);
+
         foreach (var fileInfo in contents.GetDirectoryContents(path))
-        {
+        { 
+
             if (fileInfo.IsDirectory)
             {
                 ProcessTemplates(contents, Path.Combine(path, fileInfo.Name));
@@ -94,10 +97,17 @@ public class YuzuHandlebarsTemplateEngine : IYuzuTemplateEngine
 
     private void AddPartial(string name, Stream fileStream)
     {
-        _logger.LogDebug("Registering partial view: '{partial}", name);
-        using var reader = new StreamReader(fileStream);
-        var compiled = HandlebarsDotNet.Handlebars.Compile(reader);
-        HandlebarsDotNet.Handlebars.RegisterTemplate(name, compiled);
+        try
+        {
+            _logger.LogDebug("Registering partial view: '{partial}", name);
+            using var reader = new StreamReader(fileStream);
+            var compiled = HandlebarsDotNet.Handlebars.Compile(reader);
+            HandlebarsDotNet.Handlebars.RegisterTemplate(name, compiled);
+        }
+        catch (Exception ex)
+        {
+            var d = "d";
+        }
     }
 
     private void AddPage(string name, Stream fileStream)

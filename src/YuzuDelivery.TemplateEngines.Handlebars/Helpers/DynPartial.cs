@@ -18,7 +18,7 @@ public class DynPartial
                 @ref = parameters[0].ToString();
             }
 
-            if (@ref == string.Empty)
+            if (@ref == string.Empty && parameters[1] != null)
             {
                 var vmType = parameters[1].GetType();
                 if (vmType.IsArray)
@@ -33,7 +33,7 @@ public class DynPartial
 
                 @ref = vmType.GetBlockName();
             }
-
+            
             var templates =  HandlebarsDotNet.Handlebars.Configuration.RegisteredTemplates;
 
             if (!templates.TryGetValue(@ref.RemoveFirstForwardSlash(), out var template))
