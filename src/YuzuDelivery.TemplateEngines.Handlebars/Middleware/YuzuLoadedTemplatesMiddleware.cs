@@ -47,14 +47,6 @@ public class YuzuLoadedTemplatesMiddleware : IMiddleware
             return true;
         }
 
-        if (context.Request.Headers.TryGetValue("Accept", out var accept))
-        {
-            if (accept.ToString().Contains(MediaTypeNames.Application.Json))
-            {
-                return true;
-            }
-        }
-
         return false;
     }
 }
