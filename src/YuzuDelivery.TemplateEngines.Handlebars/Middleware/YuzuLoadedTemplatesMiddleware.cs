@@ -28,26 +28,57 @@ public class YuzuLoadedTemplatesMiddleware : IMiddleware
             return;
         }
 
+        var report = new FileProviderReport();
+
         var fileProvider = _handlebarsSettings.Value.TemplatesFileProvider;
 
-        var files = fileProvider.GetDirectoryContents(string.Empty)
+        if(fileProvider is CompositeFileProvider)
+        {
+            var compositeFileProvider = (CompositeFileProvider)fileProvider;
+            foreach(var f in compositeFileProvider.FileProviders)
+            {
+                if(f is EmbeddedFileProvider)
+                {
+                    var embeddedFileProvider = (EmbeddedFileProvider)f;
+                    report.FileProviders.Add("embedded");
+                }
+
+                if (f is PhysicalFileProvider)
+                {
+                    var physicalFileProvider = (PhysicalFileProvider)f;
+                    report.FileProviders.Add($"physical {physicalFileProvider.Root}");
+                }
+            }
+        }
+        report.Files = fileProvider.GetDirectoryContents(string.Empty)
             .Cast<IFileInfo>();
 
         await context.Response.WriteAsJsonAsync(
-            files,
-            files.GetType(),
+            report,
+            report.GetType(),
             new JsonSerializerOptions(),
             MediaTypeNames.Application.Json);
     }
 
     private bool ShouldHandle(HttpContext context)
     {
-        if (context.Request.Query.ContainsKey("showJsonTemplatesSchema"))
+        if (context.Request.Query.ContainsKey("showJsonLoadedTemplates"))
         {
             return true;
         }
 
         return false;
+    }
+
+    public class FileProviderReport
+    {
+        public FileProviderReport()
+        {
+            FileProviders = new List<string>();
+        }
+
+        public List<string> FileProviders { get; set; }
+        public IEnumerable<IFileInfo> Files { get; set; }
     }
 }
 
