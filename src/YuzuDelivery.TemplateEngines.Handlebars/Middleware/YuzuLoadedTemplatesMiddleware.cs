@@ -75,14 +75,16 @@ public class YuzuLoadedTemplatesMiddleware : IMiddleware
             }
             catch (Exception ex)
             {
-                Exception = ex;
+                Exception = ex.Message;
+                ExceptionStackTrace = ex.StackTrace;
             }
 
         }
 
         public List<string> FileProviders { get; set; }
         public IEnumerable<IFileInfo> Files { get; set; }
-        public Exception? Exception { get; set; }
+        public string? Exception { get; set; }
+        public string? ExceptionStackTrace { get; set; }
 
         private void AddFileProviderToReport(IFileProvider f, FileProviderMiddleWareReport report)
         {
