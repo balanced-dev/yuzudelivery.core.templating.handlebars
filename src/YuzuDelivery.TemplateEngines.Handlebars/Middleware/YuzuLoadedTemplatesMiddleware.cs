@@ -28,30 +28,7 @@ public class YuzuLoadedTemplatesMiddleware : IMiddleware
             return;
         }
 
-        var report = new FileProviderReport();
-
-        var fileProvider = _handlebarsSettings.Value.TemplatesFileProvider;
-
-        if(fileProvider is CompositeFileProvider)
-        {
-            var compositeFileProvider = (CompositeFileProvider)fileProvider;
-            foreach(var f in compositeFileProvider.FileProviders)
-            {
-                if(f is EmbeddedFileProvider)
-                {
-                    var embeddedFileProvider = (EmbeddedFileProvider)f;
-                    report.FileProviders.Add("embedded");
-                }
-
-                if (f is PhysicalFileProvider)
-                {
-                    var physicalFileProvider = (PhysicalFileProvider)f;
-                    report.FileProviders.Add($"physical {physicalFileProvider.Root}");
-                }
-            }
-        }
-        report.Files = fileProvider.GetDirectoryContents(string.Empty)
-            .Cast<IFileInfo>();
+        var report = new FileProviderMiddleWareReport(_handlebarsSettings.Value.TemplatesFileProvider);
 
         await context.Response.WriteAsJsonAsync(
             report,
@@ -70,15 +47,56 @@ public class YuzuLoadedTemplatesMiddleware : IMiddleware
         return false;
     }
 
-    public class FileProviderReport
+    public class FileProviderMiddleWareReport
     {
-        public FileProviderReport()
+        public FileProviderMiddleWareReport(IFileProvider rootFileProvider)
         {
             FileProviders = new List<string>();
+            Files = new List<IFileInfo>();
+
+            if (rootFileProvider is CompositeFileProvider)
+            {
+                var compositeFileProvider = (CompositeFileProvider)rootFileProvider;
+                foreach (var f in compositeFileProvider.FileProviders)
+                {
+                    AddFileProviderToReport(f, this);
+                }
+            }
+            else
+            {
+                AddFileProviderToReport(rootFileProvider, this);
+            }
+
+            try
+            {
+                Files = rootFileProvider.GetDirectoryContents(string.Empty)
+                .Cast<IFileInfo>();
+            }
+            catch (Exception ex)
+            {
+                Exception = ex;
+            }
+
         }
 
         public List<string> FileProviders { get; set; }
         public IEnumerable<IFileInfo> Files { get; set; }
+        public Exception? Exception { get; set; }
+
+        private void AddFileProviderToReport(IFileProvider f, FileProviderMiddleWareReport report)
+        {
+            if (f is EmbeddedFileProvider)
+            {
+                var embeddedFileProvider = (EmbeddedFileProvider)f;
+                report.FileProviders.Add("embedded");
+            }
+
+            if (f is PhysicalFileProvider)
+            {
+                var physicalFileProvider = (PhysicalFileProvider)f;
+                report.FileProviders.Add($"physical {physicalFileProvider.Root}");
+            }
+        }
     }
 }
 
