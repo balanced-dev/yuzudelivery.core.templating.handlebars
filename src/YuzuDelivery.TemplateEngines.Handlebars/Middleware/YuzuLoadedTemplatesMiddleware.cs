@@ -70,7 +70,8 @@ public class YuzuLoadedTemplatesMiddleware : IMiddleware
             try
             {
                 Files = rootFileProvider.GetDirectoryContents(string.Empty)
-                .Cast<IFileInfo>();
+                .Cast<IFileInfo>()
+                .ToList();
             }
             catch (Exception ex)
             {
